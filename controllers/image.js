@@ -24,10 +24,7 @@ const handleApiCall = (req, res) => {
 	            console.log("Received failed status: " + response.status.description + "\n" + response.status.details);
 	            return;
 	        }
-
-	        console.log("Predicted concepts, with confidence values:")
 	        for (const c of response.outputs[0].data.regions) {
-	            console.log(response);
 	        }
 	        res.json(response)
 	    }
