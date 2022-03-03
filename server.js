@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
 
+const image = require('./controllers/image');
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -48,8 +50,8 @@ app.post('/signin', (req, res) => {
 	// bcrypt.compare("veggies", '$2a$10$gkOVwMq/UaJv2v15q/NisOtnaeZ1fEtrOR/zyw8d3lRbjH1P8PXl6', function(err, res) {
 	//     console.log('2st guess', res)
 	// });
-	if (req.body.email === database.users[0].email && 
-		req.body.password === database.users[0].password) {
+	if (req.body.email === database.users[1].email && 
+		req.body.password === database.users[1].password) {
 	res.json('success');
 	} else {
 		res.status(400).json('error logging in');
@@ -65,7 +67,6 @@ app.post('/register', (req, res) => {
 		id: '125',
 		name: name,
 		email: email,
-		password: password,
 		entries: 0,
 		joined: new Date()
 	})
@@ -86,20 +87,23 @@ app.get('/profile/:id', (req, res) => {
 	}
 })
 
-app.put('/image', (req, res) => {
-	const { id } = req.body;
-	let found = false;
-	database.users.forEach(user => {
-		if (user.id === id) {
-			found = true;
-			user.entries++;
-			res.json(user.entries);
-		}
-	})
-	if (!found) {
-		res.status(400).json('not found!');
-	}
-})
+app.put('/image', (req, res) => { image.handleImage(req, res)})
+	// const { id } = req.body;
+	// let found = false;
+	// database.users.forEach(user => {
+	// 	if (user.id === id) {
+	// 		found = true;
+	// 		user.entries++;
+	// 		res.json(user.entries);
+	// 	}
+	// })
+	// if (!found) {
+	// 	res.status(400).json('not found!');
+	// }
+
+
+app.post('/imageUrl', (req, res) => { image.handleApiCall(req, res)})
+
 
 app.listen(5000, () => {
 	console.log('app is running on port 5000');
