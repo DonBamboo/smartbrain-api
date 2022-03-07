@@ -1,4 +1,17 @@
+const knex = require('knex');
 const { ClarifaiStub, grpc } = require("clarifai-nodejs-grpc");
+
+const db = knex({
+	client: 'pg',
+  	connection: {
+    host : '127.0.0.1',
+    port : 4444,
+    user : 'postgres',
+    password : 'Desktop!brew#321',
+    database : 'smartbrain'
+  }
+});
+
 
 const stub = ClarifaiStub.grpc();
 
@@ -15,35 +28,31 @@ const handleApiCall = (req, res) => {
     },
     metadata,
 	    (err, response) => {
-	        if (err) {
-	            console.log("Error: " + err);
-	            return;
-	        }
+        if (err) {
+            console.log("Error: " + err);
+            return;
+        }
 
-	        if (response.status.code !== 10000) {
-	            console.log("Received failed status: " + response.status.description + "\n" + response.status.details);
-	            return;
-	        }
-	        for (const c of response.outputs[0].data.regions) {
-	        }
-	        res.json(response)
+        if (response.status.code !== 10000) {
+            console.log("Received failed status: " + response.status.description + "\n" + response.status.details);
+            return;
+        }
+        for (const c of response.outputs) {
+        	 res.json(response)
+        }  
 	    }
 	);
 }
 
 const handleImage = (req, res) => {
 	const { id } = req.body;
-	let found = false;
-	database.users.forEach(user => {
-		if (user.id === id) {
-			found = true;
-			user.entries++;
-			res.json(user.entries);
-		}
+	db('users').where('id', '=', id)
+	.increment('entries', 1)
+	.returning('entries')
+	.then(entries => {
+		res.json(entries[0].entries);
 	})
-	if (!found) {
-		res.status(400).json('not found!');
-	}
+	.catch(err => res.status(400).json('Unable to get entries'))
 }
 
 module.exports = { handleApiCall, handleImage }
