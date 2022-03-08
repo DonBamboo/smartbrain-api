@@ -17,9 +17,6 @@ const db = knex({
   }
 });
 
-// db.select('*').from('users').then(data => {
-// });
-
 const app = express();
 
 app.use(bodyParser.json());
@@ -51,7 +48,7 @@ app.post('/signin', (req, res) => {
 app.post('/register', (req, res) => {
 	const { email, name, password } = req.body;
 	const hash = bcrypt.hashSync(password);
-		db.transaction(trx => {
+		return db.transaction(trx => {
 			trx.insert({
 				hash: hash,
 				email: email
