@@ -1,17 +1,4 @@
-const knex = require('knex');
 const { ClarifaiStub, grpc } = require("clarifai-nodejs-grpc");
-
-const db = knex({
-	client: 'pg',
-  	connection: {
-    host : '127.0.0.1',
-    port : 4444,
-    user : 'postgres',
-    password : 'Desktop!brew#321',
-    database : 'smartbrain'
-  }
-});
-
 
 const stub = ClarifaiStub.grpc();
 
@@ -44,7 +31,7 @@ const handleApiCall = (req, res) => {
 	);
 }
 
-const handleImage = (req, res) => {
+const handleImage = (req, res, db) => {
 	const { id } = req.body;
 	db('users').where('id', '=', id)
 	.increment('entries', 1)
@@ -55,4 +42,4 @@ const handleImage = (req, res) => {
 	.catch(err => res.status(400).json('Unable to get entries'))
 }
 
-module.exports = { handleApiCall, handleImage }
+module.exports = { handleApiCall, handleImage };
